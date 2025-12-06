@@ -11,12 +11,26 @@ public class Booking {
     private BookingService bookingService;
 
     /**
-     * Конструктор з впровадженням залежності від сервісу збереження даних
+     * Конструктор без параметрів
+     */
+    /*
+    @Inject
+    public Booking(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+    */
+    
+    public Booking() {
+        // Конструктор без впровадження залежностей
+    }
+
+    /**
+     * Setter-метод з впровадженням залежності від сервісу збереження даних
      *
      * @param bookingService сервіс для збереження бронювання
      */
     @Inject
-    public Booking(BookingService bookingService) {
+    public void setBookingService(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 

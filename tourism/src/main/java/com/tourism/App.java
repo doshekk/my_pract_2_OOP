@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 /**
- * Клас для запуску імітації системи туризму з використанням Google Guice для впровадження залежностей
+ * Клас для запуску імітації системи туризму з використанням Google Guice для впровадження залежностей через setter
  */
 public class App {
     public static void main(String[] args) {
@@ -18,7 +18,7 @@ public class App {
         Manager manager = new Manager("Ірина");
         Admin admin = new Admin("Олександр");
 
-        System.out.println("=== СТАРТ СИСТЕМИ ТУРИЗМУ ===");
+        System.out.println("=== СТАРТ СИСТЕМИ ТУРИЗМУ (впровадження через setter) ===");
 
         tourist1.showRole();
         tourist2.showRole();
@@ -31,6 +31,7 @@ public class App {
         manager.approvePackage();
         admin.makeReservation("Deluxe Room");
 
+        // Створення Booking через getInstance (Guice впроважде залежність через setter)
         Booking booking1 = injector.getInstance(Booking.class);
         booking1.initialize("Deluxe Room", 120);
         booking1.showBooking();
