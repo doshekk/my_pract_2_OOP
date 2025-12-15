@@ -83,6 +83,36 @@ class BookingService {
     <<inject>>
 }
 
+%% Веб-слой: контролер, вигляд, вебсервер
+class TourismController {
+    +TourismController(service: BookingService)
+    +getAllBookingItems(): List~ПозиціяБронювання~
+}
+
+class TourismWebView {
+    +TourismWebView(controller: TourismController, server: WebServer)
+    +registerRoutes(): void
+}
+
+class WebServer {
+    <<interface>>
+    +start(port: int): void
+    +stop(): void
+    +get(path, handler): void
+    +json(obj): void
+}
+
+class JavalinWebServer {
+    +start(port: int): void
+    +stop(): void
+    +get(path, handler): void
+    +serveStatic(path): void
+}
+
+TourismWebView --> TourismController : "calls"
+TourismWebView --> WebServer : "uses"
+WebServer <|.. JavalinWebServer : "implementation"
+
 %% База даних
 class SQLiteDatabase {
     <<database>>
