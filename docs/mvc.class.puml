@@ -1,0 +1,116 @@
+classDiagram
+%% Інтерфейс для бронювання
+class IБронюванняРозміщення {
+    <<interface>>
+    +створитиБронювання(дати, номер): bool
+    +скасуватиБронювання(id): bool
+}
+
+%% Абстрактний клас Гість
+class Гість {
+    <<abstract>>
+    #імя: String
+    #email: String
+    +Гість(імя, email)
+    +отриматиІнфо(): String
+}
+
+%% Суб'єкти
+class Турист {
+    +Турист(імя, email, паспорт)
+    +забронювати(дата, готель): Бронювання
+    +змінитиБронювання(id, дати): bool
+    +скасуватиБронювання(id): bool
+    -паспорт: String
+}
+class Менеджер {
+    +Менеджер(імя, email)
+    +підібратиПакет(критерії): Пакет
+    +погодитиУмови(бронювання): bool
+}
+class Адміністратор {
+    +Адміністратор(імя, email)
+    +підтвердитиБронювання(id): bool
+    +надіслатиВаучер(id, email): bool
+}
+
+%% Бронювання, Позиція, Оплата, Пакет
+class Бронювання {
+    +Бронювання(serviceBD: BookingService)
+    +додатиПозицію(позиція): void
+    +підтвердити(): bool
+    +скасувати(): bool
+    +статус: String
+    -positii: List~ПозиціяБронювання~
+    -оплата: СервісОплати
+    -serviceBD: BookingService
+    <<inject>>
+    +getСтатус(): String
+}
+
+class ПозиціяБронювання {
+    +ПозиціяБронювання(номер, послуга)
+    +вартість: Double
+    +опис: String
+}
+
+class СервісОплати {
+    +сплатити(бронюванняId, сума): bool
+}
+
+class Пакет {
+    +Пакет(назва, опис, ціна)
+    +назва: String
+    +опис: String
+    +ціна: Double
+}
+
+%% Google Guice конфігурація
+class TourismModule {
+    <<module>>
+    -jdbcUrl: String
+    +configure(): void
+    +provideConnection(url): Connection
+    -createTableIfNotExists(conn): void
+}
+
+%% Сервіс для збереження даних
+class BookingService {
+    -connection: Connection
+    +BookingService(connection: Connection)
+    +saveBookingItem(item): void
+    +getBookingItems(): List
+    <<inject>>
+}
+
+%% База даних
+class SQLiteDatabase {
+    <<database>>
+    -url: jdbc:sqlite:target/tourism.db
+    -table: booking_items
+    +id: INTEGER
+    +room_type: TEXT
+    +price: REAL
+    +created_at: TIMESTAMP
+}
+
+%% Зв'язки
+Гість <|-- Турист
+Гість <|-- Менеджер
+Гість <|-- Адміністратор
+
+Турист ..|> IБронюванняРозміщення
+Менеджер ..|> IБронюванняРозміщення
+Адміністратор ..|> IБронюванняРозміщення
+
+Бронювання ..> СервісОплати : залежність
+Гість o-- Бронювання : "агрегація"
+Бронювання *-- ПозиціяБронювання : "композиція"
+Менеджер -- Пакет : "залежність"
+
+%% Впровадження залежностей через Guice
+Бронювання --> BookingService : "@Inject\nвпровадження"
+BookingService --> SQLiteDatabase : "зберігає\nдані"
+TourismModule --> BookingService : "конфігурує"
+TourismModule --> SQLiteDatabase : "налаштовує\nз'єднання"
+BookingService --> Бронювання : "Connection\n@Inject"

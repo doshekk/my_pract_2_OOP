@@ -69,6 +69,19 @@ public class App {
         tourist3.changeDates("1–7 вересня");
 
         System.out.println("\n=== КІНЕЦЬ РОБОТИ СИСТЕМИ ===");
+
+        // Запускаємо веб-сервер для перегляду
+        runWebMode(injector);
+    }
+
+    /**
+     * Запускає веб-режим для відображення даних на веб-сторінці
+     *
+     * @param injector Guice ін'єктор для отримання компонентів
+     */
+    private static void runWebMode(Injector injector) {
+        TourismWebView webView = injector.getInstance(TourismWebView.class);
+        webView.start(8080);
     }
 }
 

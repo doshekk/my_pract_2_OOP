@@ -2,12 +2,15 @@ package com.tourism;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.inject.Inject;
 
 /**
- * Сервіс для збереження даних про позиції бронювання в базу даних
+ * Сервіс для роботи з даними про позиції бронювання в базу даних
  */
 public class BookingService {
     private Connection connection;
@@ -39,5 +42,29 @@ public class BookingService {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to save booking item", e);
         }
+    }
+
+    /**
+     * Повертає список всіх позицій бронювання з бази даних
+     *
+     * @return список позицій бронювання
+     */
+    public List<BookingItem> getAllBookingItems() {
+        List<BookingItem> bookingItems = new ArrayList<>();
+        String sql = "SELECT room_type, price FROM booking_items";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            
+            while (resultSet.next()) {
+                String roomType = resultSet.getString("room_type");
+                double price = resultSet.getDouble("price");
+                bookingItems.add(new BookingItem(roomType, price));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve booking items", e);
+        }
+
+        return bookingItems;
     }
 }

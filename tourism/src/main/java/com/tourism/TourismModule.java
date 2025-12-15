@@ -10,6 +10,8 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import com.payroll.webserver.JavalinWebServer;
+import com.payroll.webserver.WebServer;
 
 /**
  * Google Guice модуль для впровадження залежностей та налаштування SQLite бази даних
@@ -58,5 +60,43 @@ public class TourismModule extends AbstractModule {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create table", e);
         }
+    }
+
+    /**
+     * Надає екземпляр WebServer для веб-інтерфейсу.
+     * Використовує Javalin як реалізацію, але може бути легко замінений на інший фреймворк
+     * шляхом зміни лише цього методу.
+     *
+     * @return екземпляр WebServer
+     */
+    @Provides
+    @Singleton
+    WebServer provideWebServer() {
+        return new JavalinWebServer();
+    }
+
+    /**
+     * Надає екземпляр TourismController для управління запитами
+     *
+     * @param bookingService сервіс для роботи з даними бронювання
+     * @return екземпляр TourismController
+     */
+    @Provides
+    @Singleton
+    TourismController provideTourismController(BookingService bookingService) {
+        return new TourismController(bookingService);
+    }
+
+    /**
+     * Надає екземпляр TourismWebView для відображення даних на веб-сторінці
+     *
+     * @param webServer веб-сервер Javalin
+     * @param controller контролер для отримання даних
+     * @return екземпляр TourismWebView
+     */
+    @Provides
+    @Singleton
+    TourismWebView provideTourismWebView(WebServer webServer, TourismController controller) {
+        return new TourismWebView(webServer, controller);
     }
 }
